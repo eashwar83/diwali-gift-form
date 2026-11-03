@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Diwali Gift – Shirt & Trouser Sizes</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#fff8ee; --card:#ffffff; --ink:#2a1a0e; --muted:#7a6353;
+    --saffron:#e8701a; --saffron-dark:#c45a0f; --gold:#f2b544; --line:#efdcc3;
+    --ok:#1d8a4f; --err:#c62828;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+  body{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+  .wrap{max-width:560px;margin:0 auto;padding:20px 16px 48px}
+  header{text-align:center;padding:18px 8px 10px}
+  header .diya{font-size:40px;line-height:1}
+  h1{font-family:Fraunces,Georgia,serif;font-size:28px;margin:10px 0 6px;letter-spacing:-.01em}
+  header p{margin:0;color:var(--muted);font-size:15px;line-height:1.5}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 16px;margin-top:14px;box-shadow:0 1px 2px rgba(42,26,14,.04)}
+  label.q{display:block;font-weight:600;font-size:15px;margin-bottom:8px}
+  label.q .req{color:var(--saffron);margin-left:2px}
+  .hint{color:var(--muted);font-size:13px;margin:-4px 0 10px;line-height:1.45}
+  input[type=text],input[type=tel],textarea{
+    width:100%;font:inherit;font-size:16px;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);outline:none;transition:border-color .15s
+  }
+  input:focus,textarea:focus{border-color:var(--saffron)}
+  textarea{min-height:92px;resize:vertical}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{position:relative}
+  .chip input{position:absolute;opacity:0;inset:0;width:100%;height:100%;margin:0;cursor:pointer}
+  .chip span{display:inline-block;padding:10px 14px;border:1.5px solid var(--line);border-radius:999px;font-size:15px;font-weight:500;background:#fff;user-select:none;transition:all .12s}
+  .chip input:checked + span{background:var(--saffron);border-color:var(--saffron);color:#fff}
+  .chip input:focus-visible + span{box-shadow:0 0 0 3px rgba(232,112,26,.25)}
+  .mapbox{position:relative;border-radius:14px;overflow:hidden;border:1.5px solid var(--line);margin-top:10px}
+  #map{height:300px;width:100%;background:#eee}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font:inherit;font-weight:600;font-size:15px;padding:12px 16px;border-radius:12px;border:0;cursor:pointer;transition:transform .05s,background .15s}
+  .btn:active{transform:translateY(1px)}
+  .btn-loc{width:100%;background:#fff;border:1.5px solid var(--saffron);color:var(--saffron-dark);margin-bottom:10px}
+  .btn-loc:hover{background:#fff3e6}
+  .btn-loc[disabled]{opacity:.6;cursor:default}
+  .btn-submit{width:100%;background:var(--saffron);color:#fff;font-size:17px;padding:15px;margin-top:18px;box-shadow:0 6px 18px rgba(232,112,26,.28)}
+  .btn-submit:hover{background:var(--saffron-dark)}
+  .btn-submit[disabled]{opacity:.7;cursor:default;box-shadow:none}
+  .pinstatus{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--muted);margin-top:10px;min-height:20px}
+  .pinstatus.ok{color:var(--ok);font-weight:500}
+  .pinstatus.err{color:var(--err)}
+  .err-msg{color:var(--err);font-size:13px;margin-top:6px;display:none}
+  .field.invalid .err-msg{display:block}
+  .field.invalid input[type=text],.field.invalid input[type=tel],.field.invalid textarea{border-color:var(--err)}
+  .field.invalid .mapbox{border-color:var(--err)}
+  .field + .field{margin-top:20px}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 16px;border-radius:12px;font-size:14px;box-shadow:0 8px 24px rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:opacity .2s;max-width:92vw;text-align:center}
+  .toast.show{opacity:1}
+  .done{text-align:center;padding:36px 12px}
+  .done .big{font-size:56px}
+  .done h2{font-family:Fraunces,Georgia,serif;font-size:26px;margin:12px 0 8px}
+  .done p{color:var(--muted);line-height:1.55;margin:0}
+  .done a{color:var(--saffron-dark)}
+  .leaflet-container{font-family:inherit}
+  .crosshair-tip{position:absolute;top:10px;left:50%;transform:translateX(-50%);background:rgba(42,26,14,.85);color:#fff;font-size:12.5px;padding:6px 10px;border-radius:999px;z-index:500;pointer-events:none;white-space:nowrap}
+  footer{text-align:center;color:var(--muted);font-size:12.5px;margin-top:26px;line-height:1.5}
+  footer a{color:inherit}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="diya">🪔</div>
+    <h1>Happy Diwali!</h1>
+    <p>I'd like to gift you a shirt and a pair of trousers. Share your sizes and where to send them — takes under a minute.</p>
+  </header>
+
+  <form id="giftForm" novalidate>
+    <div class="card">
+      <div class="field" data-field="name">
+        <label class="q" for="name">Your name<span class="req">*</span></label>
+        <input type="text" id="name" name="name" autocomplete="name" placeholder="Full name">
+        <div class="err-msg">Please enter your name.</div>
+      </div>
+
+      <div class="field" data-field="shirt">
+        <label class="q">Shirt size<span class="req">*</span></label>
+        <div class="chips" id="shirtChips"></div>
+        <div class="err-msg">Please pick a shirt size.</div>
+      </div>
+
+      <div class="field" data-field="trouser">
+        <label class="q">Trouser waist size (inches)<span class="req">*</span></label>
+        <div class="chips" id="trouserChips"></div>
+        <div class="err-msg">Please pick a trouser size.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="field" data-field="mobile">
+        <label class="q" for="mobile">Mobile number<span class="req">*</span></label>
+        <p class="hint">Only for the delivery person to reach you.</p>
+        <input type="tel" id="mobile" name="mobile" inputmode="numeric" autocomplete="tel" placeholder="10-digit mobile number">
+        <div class="err-msg">Please enter a valid 10-digit mobile number.</div>
+      </div>
+
+      <div class="field" data-field="location">
+        <label class="q">Where should it be delivered?<span class="req">*</span></label>
+        <p class="hint">Tap the button to use your phone's location, or drag the pin (or tap the map) to mark your house.</p>
+        <button type="button" class="btn btn-loc" id="locBtn">📍 Use my current location</button>
+        <div class="mapbox">
+          <div class="crosshair-tip" id="mapTip">Tap or drag the pin onto your house</div>
+          <div id="map"></div>
+        </div>
+        <div class="pinstatus" id="pinStatus">No location marked yet</div>
+        <div class="err-msg">Please mark your house on the map.</div>
+      </div>
+
+      <div class="field" data-field="address">
+        <label class="q" for="address">Delivery address<span class="req">*</span></label>
+        <p class="hint">Door no., street, area, city, PIN code. Landmarks help!</p>
+        <textarea id="address" name="address" autocomplete="street-address" placeholder="e.g. 12, Kumaran Street, Avinashi Road, Tiruppur 641602. Opposite Lakshmi Theatre."></textarea>
+        <div class="err-msg">Please enter the delivery address.</div>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-submit" id="submitBtn">Send my details 🎁</button>
+  </form>
+
+  <div class="card done" id="done" style="display:none">
+    <div class="big">🎉</div>
+    <h2>Got it, thank you!</h2>
+    <p id="doneText">Your sizes and location have been received. Wishing you and your family a very happy Diwali!</p>
+  </div>
+
+  <footer>Your details go only to the person sending you this gift.</footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" crossorigin=""></script>
+<script>
+(function(){
+  // ---- Google Form wiring --------------------------------------------------
+  var FORM_ACTION = 'https://docs.google.com/forms/d/e/1FAIpQLSf_-bfk45bWJPPFiMr_6HNK0XGgxdxTHpfyBI61B99ib_zHOg/formResponse';
+  var FORM_VIEW   = 'https://docs.google.com/forms/d/e/1FAIpQLSf_-bfk45bWJPPFiMr_6HNK0XGgxdxTHpfyBI61B99ib_zHOg/viewform';
+  var ENTRY = {
+    name:     'entry.488576640',
+    shirt:    'entry.1817333186',
+    trouser:  'entry.416776828',
+    address:  'entry.1989789484',
+    mobile:   'entry.1607991752',
+    location: 'entry.1072712413'
+  };
+  var SHIRT_SIZES   = ['S (38)','M (39/40)','L (42)','XL (44)','XXL (46)','3XL (48)'];
+  var TROUSER_SIZES = ['28','30','32','34','36','38','40','42'];
+
+  // ---- Build chips -----------------------------------------------------------
+  function chips(containerId, name, values){
+    var c = document.getElementById(containerId);
+    values.forEach(function(v, i){
+      var id = name + '_' + i;
+      var lab = document.createElement('label');
+      lab.className = 'chip';
+      lab.innerHTML = '<input type="radio" name="'+name+'" id="'+id+'" value="'+v+'"><span>'+v+'</span>';
+      c.appendChild(lab);
+    });
+  }
+  chips('shirtChips', 'shirt', SHIRT_SIZES);
+  chips('trouserChips', 'trouser', TROUSER_SIZES);
+
+  // ---- Map -------------------------------------------------------------------
+  var pin = null;               // {lat, lng, source}
+  var marker = null;
+  var map = null;
+  var PIN_ICON = null;
+  var pinStatus = document.getElementById('pinStatus');
+  var mapTip = document.getElementById('mapTip');
+  try {
+    PIN_ICON = L.divIcon({
+      className: '',
+      html: '<svg xmlns="http://www.w3.org/2000/svg" width="36" height="48" viewBox="0 0 36 48"><path d="M18 1C9.2 1 2 8.2 2 17c0 11.5 16 30 16 30s16-18.5 16-30C34 8.2 26.8 1 18 1z" fill="#e8701a" stroke="#fff" stroke-width="2"/><circle cx="18" cy="17" r="6.5" fill="#fff"/></svg>',
+      iconSize: [36, 48], iconAnchor: [18, 47]
+    });
+    map = L.map('map', { zoomControl: true, attributionControl: true })
+           .setView([11.108, 77.341], 7);   // Tamil Nadu by default
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+  } catch (e) {
+    mapTip.textContent = 'Map could not load — use the location button above';
+  }
+
+  function setPin(lat, lng, source, zoomTo){
+    pin = { lat: +lat.toFixed(6), lng: +lng.toFixed(6), source: source };
+    if (map){
+      if (!marker){
+        marker = L.marker([lat, lng], { draggable: true, icon: PIN_ICON }).addTo(map);
+        marker.on('dragend', function(){
+          var p = marker.getLatLng();
+          setPin(p.lat, p.lng, 'dragged', false);
+        });
+      } else {
+        marker.setLatLng([lat, lng]);
+      }
+      if (zoomTo) map.setView([lat, lng], 17);
+    }
+    pinStatus.className = 'pinstatus ok';
+    pinStatus.textContent = '✓ Location marked (' + pin.lat + ', ' + pin.lng + ')' + (source === 'gps' ? ' — drag the pin if it is slightly off' : '');
+    mapTip.textContent = 'Drag the pin to fine-tune';
+    clearInvalid('location');
+    maybeSuggestAddress(lat, lng);
+  }
+
+  if (map) map.on('click', function(e){ setPin(e.latlng.lat, e.latlng.lng, 'tapped', false); });
+
+  // Use my location
+  var locBtn = document.getElementById('locBtn');
+  locBtn.addEventListener('click', function(){
+    if (!navigator.geolocation){
+      pinStatus.className = 'pinstatus err';
+      pinStatus.textContent = 'Your browser cannot share location — please tap your house on the map instead.';
+      return;
+    }
+    locBtn.disabled = true;
+    locBtn.textContent = '⏳ Finding you…';
+    navigator.geolocation.getCurrentPosition(function(pos){
+      locBtn.disabled = false;
+      locBtn.textContent = '📍 Use my current location';
+      setPin(pos.coords.latitude, pos.coords.longitude, 'gps', true);
+      if (pos.coords.accuracy > 150){
+        toast('Location is approximate (±' + Math.round(pos.coords.accuracy) + ' m). Drag the pin onto your house.');
+      }
+    }, function(err){
+      locBtn.disabled = false;
+      locBtn.textContent = '📍 Use my current location';
+      pinStatus.className = 'pinstatus err';
+      pinStatus.textContent = (err.code === 1)
+        ? 'Location permission was denied — no problem, just tap your house on the map.'
+        : 'Could not get your location — please tap your house on the map.';
+    }, { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 });
+  });
+
+  // Optional: suggest an address from the pin (best effort, never blocks)
+  var geocodeTimer = null;
+  function maybeSuggestAddress(lat, lng){
+    var addr = document.getElementById('address');
+    if (addr.value.trim() || addr.dataset.touched === '1') return;
+    clearTimeout(geocodeTimer);
+    geocodeTimer = setTimeout(function(){
+      var url = 'https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=18&lat=' + lat + '&lon=' + lng;
+      fetch(url, { headers: { 'Accept': 'application/json' } })
+        .then(function(r){ return r.ok ? r.json() : null; })
+        .then(function(j){
+          if (!j || !j.address || addr.value.trim()) return;
+          var a = j.address;
+          var parts = [a.house_number, a.road, a.neighbourhood || a.suburb, a.city || a.town || a.village, a.postcode].filter(Boolean);
+          if (parts.length >= 2){
+            addr.value = parts.join(', ');
+            addr.placeholder = '';
+            clearInvalid('address');
+            toast('Address filled in from the pin — please add your door no. and landmark.');
+          }
+        }).catch(function(){});
+    }, 600);
+  }
+  document.getElementById('address').addEventListener('input', function(){ this.dataset.touched = '1'; });
+
+  // ---- Validation ------------------------------------------------------------
+  function fieldEl(key){ return document.querySelector('.field[data-field="'+key+'"]'); }
+  function markInvalid(key){ fieldEl(key).classList.add('invalid'); }
+  function clearInvalid(key){ fieldEl(key).classList.remove('invalid'); }
+  ['name','mobile','address'].forEach(function(k){
+    document.getElementById(k).addEventListener('input', function(){ clearInvalid(k); });
+  });
+  document.getElementById('shirtChips').addEventListener('change', function(){ clearInvalid('shirt'); });
+  document.getElementById('trouserChips').addEventListener('change', function(){ clearInvalid('trouser'); });
+
+  function checked(name){ var el = document.querySelector('input[name="'+name+'"]:checked'); return el ? el.value : ''; }
+
+  function validate(){
+    var ok = true, first = null;
+    function bad(k){ markInvalid(k); ok = false; if (!first) first = fieldEl(k); }
+    var name = document.getElementById('name').value.trim();
+    if (!name) bad('name');
+    if (!checked('shirt')) bad('shirt');
+    if (!checked('trouser')) bad('trouser');
+    var mobile = document.getElementById('mobile').value.replace(/\D/g,'');
+    if (mobile.length === 12 && mobile.indexOf('91') === 0) mobile = mobile.slice(2);
+    if (mobile.length !== 10) bad('mobile');
+    if (!pin) bad('location');
+    if (!document.getElementById('address').value.trim()) bad('address');
+    if (first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return ok ? { name: name, mobile: mobile } : null;
+  }
+
+  // ---- Submit ----------------------------------------------------------------
+  var submitBtn = document.getElementById('submitBtn');
+  document.getElementById('giftForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    var v = validate();
+    if (!v) return;
+
+    var mapsLink = 'https://www.google.com/maps?q=' + pin.lat + ',' + pin.lng;
+    var data = new URLSearchParams();
+    data.append(ENTRY.name, v.name);
+    data.append(ENTRY.shirt, checked('shirt'));
+    data.append(ENTRY.trouser, checked('trouser'));
+    data.append(ENTRY.address, document.getElementById('address').value.trim());
+    data.append(ENTRY.mobile, v.mobile);
+    data.append(ENTRY.location, pin.lat + ', ' + pin.lng + ' | ' + mapsLink + ' (' + pin.source + ')');
+    data.append('fvv', '1');
+    data.append('pageHistory', '0');
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sending…';
+
+    fetch(FORM_ACTION, { method: 'POST', mode: 'no-cors', body: data,
+                         headers: { 'Content-Type': 'application/x-www-form-urlencoded' } })
+      .then(function(){ showDone(); })
+      .catch(function(){
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Send my details 🎁';
+        toast('Could not send. Please check your internet and try again.');
+      });
+  });
+
+  function showDone(){
+    document.getElementById('giftForm').style.display = 'none';
+    var d = document.getElementById('done');
+    d.style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  var toastTimer = null;
+  function toast(msg){
+    var t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 4200);
+  }
+})();
+</script>
+</body>
+</html>
