@@ -95,6 +95,12 @@
         <div class="err-msg">Please pick a shirt size.</div>
       </div>
 
+      <div class="field" data-field="sleeve">
+        <label class="q">Shirt sleeve<span class="req">*</span></label>
+        <div class="chips" id="sleeveChips"></div>
+        <div class="err-msg">Please pick half or full sleeve.</div>
+      </div>
+
       <div class="field" data-field="trouser">
         <label class="q">Trouser waist size (inches)<span class="req">*</span></label>
         <div class="chips" id="trouserChips"></div>
@@ -146,6 +152,7 @@
   var ENTRY = {
     name:     'entry.488576640',
     shirt:    'entry.1817333186',
+    sleeve:   'entry.1934163659',
     trouser:  'entry.416776828',
     address:  'entry.1989789484',
     mobile:   'entry.1607991752',
@@ -153,6 +160,7 @@
   };
   var SHIRT_SIZES   = ['S (38)','M (39/40)','L (42)','XL (44)'];
   var TROUSER_SIZES = ['28','30','32','34','36','38','40','42'];
+  var SLEEVES       = ['Half sleeve','Full sleeve'];
 
   // ---- Build chips -----------------------------------------------------------
   function chips(containerId, name, values){
@@ -166,6 +174,7 @@
     });
   }
   chips('shirtChips', 'shirt', SHIRT_SIZES);
+  chips('sleeveChips', 'sleeve', SLEEVES);
   chips('trouserChips', 'trouser', TROUSER_SIZES);
 
   // ---- Map -------------------------------------------------------------------
@@ -274,6 +283,7 @@
     document.getElementById(k).addEventListener('input', function(){ clearInvalid(k); });
   });
   document.getElementById('shirtChips').addEventListener('change', function(){ clearInvalid('shirt'); });
+  document.getElementById('sleeveChips').addEventListener('change', function(){ clearInvalid('sleeve'); });
   document.getElementById('trouserChips').addEventListener('change', function(){ clearInvalid('trouser'); });
 
   function checked(name){ var el = document.querySelector('input[name="'+name+'"]:checked'); return el ? el.value : ''; }
@@ -284,6 +294,7 @@
     var name = document.getElementById('name').value.trim();
     if (!name) bad('name');
     if (!checked('shirt')) bad('shirt');
+    if (!checked('sleeve')) bad('sleeve');
     if (!checked('trouser')) bad('trouser');
     var mobile = document.getElementById('mobile').value.replace(/\D/g,'');
     if (mobile.length === 12 && mobile.indexOf('91') === 0) mobile = mobile.slice(2);
@@ -305,6 +316,7 @@
     var data = new URLSearchParams();
     data.append(ENTRY.name, v.name);
     data.append(ENTRY.shirt, checked('shirt'));
+    data.append(ENTRY.sleeve, checked('sleeve'));
     data.append(ENTRY.trouser, checked('trouser'));
     data.append(ENTRY.address, document.getElementById('address').value.trim());
     data.append(ENTRY.mobile, v.mobile);
